@@ -6,7 +6,7 @@
     <title>🐧 alinuxpengui Goodnotes Audio and PDF File Extractor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <style>
-       .github-corner {
+        .github-corner {
             position: fixed;
             top: 20px;
             right: 20px;
@@ -138,8 +138,8 @@
 </head>
 <body>
     <button class="reset-button" onclick="resetFileInput()">↻ Reset</button>
-    <a href="https://github.com/alinuxpengui/goodnotes-extractor" 
-       class="github-corner" 
+    <a href="https://github.com/alinuxpengui/goodnotes-extractor"
+       class="github-corner"
        target="_blank"
        rel="noopener noreferrer">
        ⭐ Star on GitHub
@@ -147,7 +147,7 @@
 
     <div class="container">
         <h1>🐧 alinuxpengui Goodnotes Audio and PDF File Extractor</h1>
-        
+
         <div class="upload-section">
             <label class="custom-file-upload">
                 📁 Select GoodNotes File
@@ -158,35 +158,21 @@
     </div>
 
     <script>
-       
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const fileParam = urlParams.get('file');
-            
-            if (fileParam) {
-                const [header, base64] = fileParam.split(',');
-                const mimeType = header.match(/:(.*?);/)[1];
-                const byteString = atob(base64);
-                const arrayBuffer = new ArrayBuffer(byteString.length);
-                const uintArray = new Uint8Array(arrayBuffer);
-                
-                for (let i = 0; i < byteString.length; i++) {
-                    uintArray[i] = byteString.charCodeAt(i);
-                }
-                
-                const blob = new Blob([arrayBuffer], {type: mimeType});
-                processFile(blob);
-            }
-        });
+        function resetFileInput() {
+            document.getElementById('goodnotesFile').value = '';
+            document.getElementById('results').innerHTML = '';
+        }
 
-        
-        async function processFile(blob) {
+        document.getElementById('goodnotesFile').addEventListener('change', async (e) => {
             try {
+                const file = e.target.files[0];
+                if (!file) return;
+
                 const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = '<div class="loading">Processing file... 🔍</div>';
 
-                const zip = await JSZip.loadAsync(blob);
-                
+                const zip = await JSZip.loadAsync(file);
+
                 const attachments = [];
                 zip.forEach((relativePath, zipEntry) => {
                     if (zipEntry.name.toLowerCase().includes('attachments/') && !zipEntry.dir) {
@@ -195,19 +181,20 @@
                 });
 
                 if (attachments.length === 0) {
-                    resultsDiv.innerHTML = "❌ No attachments found!";
+                    resultsDiv.innerHTML = "❌ File not found!";
                     return;
                 }
 
-                const sortedFiles = attachments.sort((a, b) => 
+                const sortedFiles = attachments.sort((a, b) =>
                     b._data.uncompressedSize - a._data.uncompressedSize
                 );
 
                 const filesHTML = await Promise.all(
                     sortedFiles.map(async (zipEntry, index) => {
-                        const entryBlob = await zipEntry.async('blob');
-                        let extension = await guessExtension(entryBlob);
-                        
+                        const blob = await zipEntry.async('blob');
+                        let extension = await guessExtension(blob);
+
+
                         if(['m4a', 'mp4', 'bin'].includes(extension)) {
                             extension = 'mp3';
                         }
@@ -215,12 +202,12 @@
                         return `
                             <div class="file-item">
                                 <div>
-                                    <strong>#${index + 1}</strong> • 
-                                    ${Math.round(entryBlob.size/1024/1024)} MB • 
+                                    <strong>#${index + 1}</strong> •
+                                    ${Math.round(blob.size/1024/1024)} MB •
                                     <span class="file-type">${extension.toUpperCase()}</span>
                                 </div>
-                                <a class="download-btn" 
-                                   href="${URL.createObjectURL(entryBlob)}" 
+                                <a class="download-btn"
+                                   href="${URL.createObjectURL(blob)}"
                                    download="file_${index + 1}.${extension}">
                                     Download ⬇️
                                 </a>
@@ -232,30 +219,25 @@
                 resultsDiv.innerHTML = filesHTML.join('');
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Hata:', error);
                 resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
             }
-        }
-
-        
-        function resetFileInput() {
-            document.getElementById('goodnotesFile').value = '';
-            document.getElementById('results').innerHTML = '';
-        }
+        });
 
         async function guessExtension(blob) {
             const signatures = {
-                'mp3': [0x49, 0x44, 0x33],
-                'm4a': [0x66, 0x74, 0x79, 0x70],
+                'mp3': [0x49, 0x44, 0x33],        // ID3 tag (MP3)
+                'm4a': [0x66, 0x74, 0x79, 0x70],  // ftyp (M4A/MP4)
                 'pdf': [0x25, 0x50, 0x44, 0x46],
                 'png': [0x89, 0x50, 0x4E, 0x47]
             };
 
             const header = await blob.slice(0, 8).arrayBuffer();
             const bytes = new Uint8Array(header);
-            
+
+
             if(bytes[4] === 0x25 && bytes[5] === 0x50 && bytes[6] === 0x44) return 'pdf';
-            
+
             for (const [ext, sig] of Object.entries(signatures)) {
                 if (sig.every((byte, i) => bytes[i] === byte)) {
                     return ext;
@@ -263,13 +245,6 @@
             }
             return 'bin';
         }
-
-       
-        document.getElementById('goodnotesFile').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            await processFile(file);
-        });
     </script>
 </body>
 </html>
