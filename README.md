@@ -1,6 +1,6 @@
-# 🐧 alinuxpengui Goodnotes File Extractor
+# 🐧 alinuxpengui Goodnotes Audio and PDF File Extractor
 
-**Privacy-First GoodNotes File Extractor**  
+**Privacy-First Goodnotes Audio and PDF File Extractor**  
 📌 *No files are stored - All processing happens in your browser!*  
 
 ---
@@ -40,7 +40,7 @@
 ---
 
 ## ❓ Why Is the First File Usually Audio?
-GoodNotes stores files in `attachments/` folder with random names.  
+GoodNotes stores files in `Attachments/` folder with random names.  
 🔍 **Our detection logic**:  
 1. Extract all files from `.goodnotes` (ZIP format)  
 2. Sort files by size (audio = largest → smallest)  
