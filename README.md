@@ -75,7 +75,14 @@ Contribute on GitHub:
 ---
 
 ## Star History
-<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embed?secret=#alinuxpengui/goodnotes-extractor&Date" frameBorder="0"></iframe>
+
+<a href="https://star-history.com/#alinuxpengui/goodnotes-extractor&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=alinuxpengui/goodnotes-extractor&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=alinuxpengui/goodnotes-extractor&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=alinuxpengui/goodnotes-extractor&type=Date" />
+ </picture>
+</a>
 
 ---
 
