@@ -74,5 +74,10 @@ Contribute on GitHub:
 
 ---
 
+## Star History
+<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embed?secret=#alinuxpengui/goodnotes-extractor&Date" frameBorder="0"></iframe>
+
+---
+
 *Made with 🐧 by alinuxpengui - No affiliation with GoodNotes*  
 *⚠️ Disclaimer: For educational use only*
