@@ -1,4 +1,4 @@
-# 🐧 alinuxpengui Goodnotes Audio and PDF File Extractor
+# 🐧 Goodnotes Audio and PDF File Extractor
 
 **Privacy-First Goodnotes Audio and PDF File Extractor**  
 📌 *No files are stored - All processing happens in your browser!*  
