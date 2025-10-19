@@ -5,22 +5,57 @@
 }
 
 :root {
+    /* Background Colors */
     --bg-gradient-start: #f8f9fa;
     --bg-gradient-end: #e9ecef;
+    --card-bg: #ffffff;
+    --overlay-bg: rgba(0, 0, 0, 0.9);
+    --upload-hover-bg: #f0f7ff;
+    
+    /* Text Colors */
     --text-primary: #000000;
     --text-secondary: #6c757d;
+    --text-white: #ffffff;
+    
+    /* Brand Colors */
     --primary-color: #2eac34;
     --primary-hover: #258a2a;
-    --card-bg: #ffffff;
     --border-color: #c9ae8c;
-    --shadow-sm: 0 2px 4px rgba(46, 172, 52, 0.1);
-    --shadow-md: 0 4px 12px rgba(46, 172, 52, 0.15);
-    --shadow-lg: 0 8px 24px rgba(46, 172, 52, 0.2);
+    
+    /* Status Colors */
     --success-color: #2eac34;
     --danger-color: #dc3545;
     --warning-color: #c9ae8c;
-    --audio-color: #2eac34;
-    --pdf-color: #2eac34;
+    
+    /* Component-specific Colors */
+    --audio-gradient-start: #c9ae8c;
+    --audio-gradient-end: #b3987a;
+    --image-badge-bg: #e8f5e9;
+    --audio-badge-bg: #f5f0ea;
+    --pdf-badge-bg: #fee;
+    --error-bg: #fee;
+    --error-border: #fcc;
+    --modal-button-bg: rgba(255, 255, 255, 0.1);
+    --modal-button-border: rgba(255, 255, 255, 0.2);
+    --modal-button-hover: rgba(255, 255, 255, 0.2);
+    --footer-bg: rgba(248, 249, 250, 0.8);
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(46, 172, 52, 0.1);
+    --shadow-md: 0 4px 12px rgba(46, 172, 52, 0.15);
+    --shadow-lg: 0 8px 24px rgba(46, 172, 52, 0.2);
+    --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-audio: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   1. GLOBAL STYLES
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -32,9 +67,36 @@ body {
     line-height: 1.6;
 }
 
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+/* ============================================
+   2. LAYOUT COMPONENTS
+   ============================================ */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 .header {
     text-align: center;
     margin-bottom: 3rem;
+}
+
+.logo-img {
+    width: 128px;
+    height: 128px;
+    vertical-align: middle;
+    margin-right: 8px;
 }
 
 .header-actions {
@@ -45,6 +107,10 @@ body {
     gap: 0.75rem;
     z-index: 100;
 }
+
+/* ============================================
+   3. BUTTONS & INTERACTIVE ELEMENTS
+   ============================================ */
 
 .reset-button,
 .github-corner {
@@ -71,23 +137,47 @@ body {
     border-color: var(--primary-color);
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+.btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
 }
 
-h1 {
-    font-size: 2rem;
-    font-weight: 600;
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--text-white);
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: var(--bg-gradient-start);
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    border: 1px solid var(--border-color);
 }
 
-.subtitle {
-    color: var(--text-secondary);
-    font-size: 1rem;
-    font-weight: 400;
+.btn-secondary:hover {
+    background: var(--card-bg);
+    border-color: var(--primary-color);
 }
+
+/* ============================================
+   4. UPLOAD SECTION
+   ============================================ */
 
 .upload-section {
     background: var(--card-bg);
@@ -96,10 +186,6 @@ h1 {
     box-shadow: var(--shadow-md);
     margin-bottom: 2rem;
     border: 1px solid var(--border-color);
-}
-
-input[type="file"] {
-    display: none;
 }
 
 .custom-file-upload {
@@ -118,7 +204,7 @@ input[type="file"] {
 
 .custom-file-upload:hover {
     border-color: var(--primary-color);
-    background: #f0f7ff;
+    background: var(--upload-hover-bg);
 }
 
 .upload-icon {
@@ -138,6 +224,16 @@ input[type="file"] {
     font-size: 0.875rem;
     color: var(--text-secondary);
 }
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+/* ============================================
+   5. RESULTS SECTION
+   ============================================ */
 
 #results {
     margin-top: 2rem;
@@ -163,13 +259,17 @@ input[type="file"] {
 
 .results-count {
     background: var(--primary-color);
-    color: white;
+    color: var(--text-white);
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.875rem;
     font-weight: 500;
     display: inline-block;
 }
+
+/* ============================================
+   6. FILE GRID & CARDS
+   ============================================ */
 
 .files-grid {
     display: grid;
@@ -191,92 +291,6 @@ input[type="file"] {
     transform: translateY(-4px);
 }
 
-.file-preview {
-    width: 100%;
-    height: 200px;
-    background: var(--bg-gradient-start);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.file-preview iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: white;
-}
-
-.preview-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    padding: 1rem;
-    text-align: center;
-}
-
-.preview-icon {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
-}
-
-.preview-icon.audio {
-    color: var(--audio-color);
-    animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-}
-
-.preview-icon.pdf {
-    color: var(--pdf-color);
-}
-
-.audio-player {
-    width: 100%;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #c9ae8c 0%, #b3987a 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
-}
-
-.audio-player::before {
-    content: "";
-    width: 48px;
-    height: 48px;
-    margin-bottom: 1rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-.audio-player audio {
-    width: 100%;
-    max-width: 100%;
-    height: 40px;
-    outline: none;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
-}
-
 .file-info {
     padding: 1.25rem;
 }
@@ -290,30 +304,11 @@ input[type="file"] {
 
 .file-number {
     background: var(--primary-color);
-    color: white;
+    color: var(--text-white);
     font-weight: 600;
     font-size: 0.875rem;
     padding: 0.25rem 0.625rem;
     border-radius: 6px;
-}
-
-.file-type-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.file-type-badge.pdf {
-    background: #fee;
-    color: var(--pdf-color);
-}
-
-.file-type-badge.audio {
-    background: #f5f0ea;
-    color: #c9ae8c;
 }
 
 .file-meta {
@@ -345,48 +340,212 @@ input[type="file"] {
     white-space: nowrap;
 }
 
+.inline-svg {
+    vertical-align: middle;
+}
+
 .file-actions {
     display: flex;
     gap: 0.5rem;
 }
 
-.btn {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
+/* ============================================
+   7. FILE TYPE BADGES
+   ============================================ */
+
+.file-type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.file-type-badge.pdf {
+    background: var(--pdf-badge-bg);
+    color: var(--primary-color);
+}
+
+.file-type-badge.audio {
+    background: var(--audio-badge-bg);
+    color: var(--border-color);
+}
+
+.file-type-badge.image {
+    background: var(--image-badge-bg);
+    color: var(--primary-color);
+}
+
+/* ============================================
+   8. FILE PREVIEWS
+   ============================================ */
+
+.file-preview {
+    width: 100%;
+    height: 200px;
+    background: var(--bg-gradient-start);
+    display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.file-preview iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: var(--card-bg);
+}
+
+.preview-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    padding: 1rem;
+    text-align: center;
+}
+
+.preview-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Image Preview */
+.image-preview {
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.image-preview:hover img {
+    transform: scale(1.05);
+}
+
+/* Audio Player */
+.audio-player {
+    width: 100%;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--audio-gradient-start) 0%, var(--audio-gradient-end) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.audio-player::before {
+    content: "";
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+.audio-player audio {
+    width: 100%;
+    max-width: 100%;
+    height: 40px;
+    outline: none;
+    filter: drop-shadow(var(--shadow-audio));
+}
+
+/* ============================================
+   9. IMAGE MODAL
+   ============================================ */
+
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    z-index: 1001;
+}
+
+.modal-content img {
+    max-width: 100%;
+    max-height: calc(90vh - 80px);
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: var(--shadow-modal);
+}
+
+.modal-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    background: var(--modal-button-bg);
+    border: 1px solid var(--modal-button-border);
+    color: var(--text-white);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.modal-close:hover {
+    background: var(--modal-button-hover);
+    transform: rotate(90deg);
+}
+
+.modal-actions {
+    display: flex;
     gap: 0.5rem;
-    text-decoration: none;
 }
 
-.btn-primary {
-    background: var(--primary-color);
-    color: white;
+.modal-actions .btn {
+    min-width: 120px;
 }
 
-.btn-primary:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-secondary {
-    background: var(--bg-gradient-start);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-    background: white;
-    border-color: var(--primary-color);
-}
+/* ============================================
+   10. LOADING & STATES
+   ============================================ */
 
 .loading {
     text-align: center;
@@ -404,17 +563,13 @@ input[type="file"] {
     margin: 0 auto 1rem;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
 .error-message {
-    background: #fee;
+    background: var(--error-bg);
     color: var(--danger-color);
     padding: 1.5rem;
     border-radius: 12px;
     text-align: center;
-    border: 1px solid #fcc;
+    border: 1px solid var(--error-border);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -437,6 +592,10 @@ input[type="file"] {
     color: var(--text-secondary);
 }
 
+/* ============================================
+   11. FOOTER
+   ============================================ */
+
 .thank-you-section {
     text-align: center;
     padding: 1.5rem 1rem;
@@ -449,39 +608,28 @@ input[type="file"] {
     flex-direction: column;
     gap: 0.25rem;
     backdrop-filter: blur(10px);
-    background: rgba(248, 249, 250, 0.8);
+    background: var(--footer-bg);
 }
 
-.thank-you-text {
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    margin: 0;
-}
-
-.thank-you-text a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.thank-you-text a:hover {
-    color: var(--primary-hover);
-    text-decoration: underline;
-}
-
+.thank-you-text,
 .made-with-love {
     color: var(--text-secondary);
     font-size: 0.75rem;
     margin: 0;
 }
 
+.thank-you-text a,
 .made-with-love a {
     color: var(--primary-color);
     text-decoration: none;
     transition: color 0.2s ease;
+}
+
+.made-with-love a {
     font-weight: 500;
 }
 
+.thank-you-text a:hover,
 .made-with-love a:hover {
     color: var(--primary-hover);
     text-decoration: underline;
@@ -506,9 +654,27 @@ input[type="file"] {
 }
 
 .heart {
-    color: #dc3545;
+    color: var(--danger-color);
     display: inline-block;
     animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   12. ANIMATIONS
+   ============================================ */
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
 }
 
 @keyframes heartbeat {
@@ -516,6 +682,10 @@ input[type="file"] {
     10%, 30% { transform: scale(1.1); }
     20%, 40% { transform: scale(1); }
 }
+
+/* ============================================
+   13. RESPONSIVE DESIGN
+   ============================================ */
 
 @media (max-width: 768px) {
     body {

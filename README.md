@@ -7,7 +7,7 @@
 [![GitHub](https://img.shields.io/github/license/FirstGameGG/goodnotes-extractor?style=for-the-badge)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/FirstGameGG/goodnotes-extractor?style=for-the-badge)](https://github.com/FirstGameGG/goodnotes-extractor/stargazers)
 
-**Extract audio recordings and PDF files from your GoodNotes documents with complete privacy**
+**Extract MP3 audio, PDF documents, and images (PNG/JPG) from your GoodNotes documents with complete privacy**
 
 [🚀 Try Now](https://firstgamegg.github.io/goodnotes-extractor/) • [📖 Documentation](#documentation) • [🐛 Report Bug](https://github.com/FirstGameGG/goodnotes-extractor/issues)
 
@@ -34,23 +34,30 @@
 ## ✨ Features
 
 ### Core Functionality
-- 🎯 **Extract Audio & PDFs** - Automatically extract all attachments from GoodNotes documents
-- 📊 **Smart Detection** - Files sorted by size with automatic format detection
-- 🎨 **Live Preview** - Play audio and preview PDFs directly in the browser
+- 🎯 **Extract Four File Types** - MP3 audio, PDF documents, PNG images, and JPG/JPEG images
+- 📊 **Smart Detection** - Automatic file format detection with magic number signatures
+- 🎨 **Rich Previews** - Play audio, view PDFs, and preview images inline
+- 🖼️ **Image Modal** - Click images to view full-screen with download option
 - 📦 **Batch Processing** - Handle multiple `.goodnotes` files simultaneously
 - ⬇️ **Flexible Downloads** - Download files individually or all at once
+- 🎯 **Smart File Naming** - Files named based on source document for easy organization
+- 🎯 **Format Filtering** - Automatically filters out unsupported file formats
 
 ### User Experience
 - 🎨 **Modern Interface** - Clean, intuitive design with smooth animations
 - 📱 **Fully Responsive** - Works perfectly on desktop, tablet, and mobile devices
 - 🌓 **Visual Feedback** - Loading states, progress indicators, and clear error messages
+- 🏷️ **File Type Badges** - Color-coded badges for audio, PDF, and image files
 - ♿ **Accessible** - Built with accessibility best practices
+- 🔄 **Reset Function** - Quick reset to start over with new files
 
 ### Technical Excellence
 - 🔒 **100% Client-Side** - Zero server involvement, all processing in your browser
 - 🚀 **No Installation** - Works directly in any modern web browser
 - ⚡ **Fast Processing** - Optimized for quick extraction and preview
-- 🔄 **Memory Efficient** - Automatic cleanup prevents memory leaks
+- 🔄 **Memory Efficient** - Automatic blob URL cleanup prevents memory leaks
+- 🎨 **CSS Variables** - Easily customizable theme with centralized color management
+- 📐 **Organized Code** - Well-structured JavaScript with clear separation of concerns
 
 ---
 
@@ -128,37 +135,48 @@ This extractor:
 1. **Reads** the `.goodnotes` file using [JSZip](https://stuk.github.io/jszip/)
 2. **Identifies** files in the `Attachments/` directory
 3. **Detects** file types using magic number signatures
-4. **Sorts** by size (largest first - typically audio recordings)
-5. **Generates** blob URLs for preview and download
-6. **Cleans up** memory when done
+4. **Filters** only MP3, PDF, PNG, and JPG files (other formats are skipped)
+5. **Sorts** by size (largest first - typically audio recordings)
+6. **Generates** blob URLs for preview and download
+7. **Cleans up** memory when done
 
 ### File Detection Logic
 
 ```javascript
-// Audio files (M4A/MP3)
-Signature: [0x66, 0x74, 0x79, 0x70] - 'ftyp' (M4A/MP4)
+// Supported Audio files (converted to MP3)
+Signature: [0x66, 0x74, 0x79, 0x70] - 'ftyp' (M4A/MP4) → MP3
 Signature: [0x49, 0x44, 0x33] - 'ID3' (MP3)
+Unknown binary files → MP3 (assumed audio)
 
-// PDF files
+// Supported PDF files
 Signature: [0x25, 0x50, 0x44, 0x46] - '%PDF'
 
-// PNG images
+// Supported Image files
 Signature: [0x89, 0x50, 0x4E, 0x47] - PNG
+Signature: [0xFF, 0xD8, 0xFF] - JPEG/JPG
+
+// Unsupported formats are automatically filtered out
 ```
 
 ---
 
 ## 📦 Supported File Types
 
+**This extractor only processes 4 file types:**
+
 | Format | Extension | Preview | Download | Notes |
 |--------|-----------|---------|----------|-------|
-| Audio (M4A) | `.mp3` | ✅ | ✅ | Most GoodNotes recordings |
+| Audio (M4A) | `.mp3` | ✅ | ✅ | GoodNotes recordings, converted to MP3 |
 | Audio (MP3) | `.mp3` | ✅ | ✅ | Standard MP3 files |
-| PDF | `.pdf` | ✅ | ✅ | Embedded PDFs |
-| PNG | `.png` | ❌ | ✅ | Image attachments |
-| Other | `.bin` | ❌ | ✅ | Unknown formats |
+| PDF | `.pdf` | ✅ | ✅ | Document attachments |
+| PNG | `.png` | ✅ | ✅ | PNG images with full-screen modal |
+| JPEG | `.jpg` | ✅ | ✅ | JPG/JPEG images with full-screen modal |
 
-**Note:** Audio files are automatically labeled as `.mp3` for compatibility, even if they're M4A format. If playback fails, try renaming to `.m4a`.
+**Note:**
+- ✅ **Supported & Extracted**: MP3 (audio), PDF (documents), PNG (images), JPG/JPEG (images)
+- ❌ **Not Supported**: GIF, WEBP, BMP, and other formats are automatically filtered out
+- 🔄 **Auto-conversion**: M4A audio files are automatically converted to MP3 format
+- 🎯 **Unknown files**: Binary files with unknown signatures are treated as MP3 audio
 
 ---
 
@@ -236,6 +254,19 @@ Signature: [0x89, 0x50, 0x4E, 0x47] - PNG
 - Try in a different browser
 </details>
 
+<details>
+<summary><strong>🖼️ Image preview not displaying</strong></summary>
+
+**Possible causes:**
+- Unsupported image format
+- Browser compatibility
+
+**Solutions:**
+- Click the "View" button to open in new tab
+- Download the image and open locally
+- Try in a different browser
+</details>
+
 ---
 
 ## 💡 FAQ
@@ -255,8 +286,20 @@ A: Yes! You can select multiple `.goodnotes` files and process them simultaneous
 **Q: Why is the first file usually the audio recording?**  
 A: Files are sorted by size (largest first), and audio recordings are typically the largest files in GoodNotes documents.
 
+**Q: Can I preview images?**  
+A: Yes! PNG and JPG images show as thumbnails in the file cards. Click any image to view it full-screen in a modal with download option.
+
+**Q: What file types are supported?**  
+A: Only four file types: MP3 (audio), PDF (documents), PNG (images), and JPG/JPEG (images). Other formats like GIF, WEBP are automatically filtered out.
+
+**Q: Why don't I see all my images?**  
+A: This extractor only supports PNG and JPG/JPEG images. GIF, WEBP, BMP, and other image formats are not extracted. This is by design to focus on the most common GoodNotes attachments.
+
 **Q: Does this work offline?**  
 A: After the first load, the app can work offline except for the JSZip library which is loaded from CDN.
+
+**Q: How are file names determined?**  
+A: Files are named using the source GoodNotes document name plus an index number (e.g., `MyNotes_1.mp3`, `MyNotes_2.pdf`).
 
 **Q: Is there a file size limit?**  
 A: No hard limit, but performance may degrade with files larger than 500MB depending on your device.
@@ -280,13 +323,25 @@ A: Absolutely! See the [Contributing](#-contributing) section below.
 ```
 goodnotes-extractor/
 ├── index.html          # Main HTML file
-├── script.js           # Core extraction logic
-├── styles.css          # Styling
+├── script.js           # Core extraction logic (organized & refactored)
+├── styles.css          # Modular CSS with variables
 ├── assets/
 │   └── images/         # Logo and images
 ├── .nojekyll          # GitHub Pages config
 └── README.md          # Documentation
 ```
+
+### Code Organization
+
+The JavaScript is now organized into clear sections:
+- **Constants** - Centralized configuration (file types, MIME types, signatures)
+- **Utility Functions** - Helper functions for common tasks
+- **File Processing** - Core extraction and processing logic
+- **HTML Templates** - Reusable template functions for UI generation
+- **File Type Detection** - Magic number signature detection
+- **Download Functions** - File saving with browser API support
+- **Modal Functions** - Image preview modal management
+- **Batch Operations** - Multi-file download handling
 
 ### Local Development
 
@@ -334,14 +389,6 @@ Contributions are welcome! Here's how you can help:
 - Add comments for complex logic
 - Test thoroughly before submitting
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 🙏 Credits & Attribution
 
 ### Original Project
@@ -354,18 +401,6 @@ This project is a fork of [alinuxpengui/goodnotes-extractor](https://github.com/
 
 ### Maintainer
 Made with ❤️ by [FirstGameGG](https://github.com/FirstGameGG)
-
----
-
-## 📊 Star History
-
-<a href="https://star-history.com/#FirstGameGG/goodnotes-extractor&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=FirstGameGG/goodnotes-extractor&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=FirstGameGG/goodnotes-extractor&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=FirstGameGG/goodnotes-extractor&type=Date" />
- </picture>
-</a>
 
 ---
 
