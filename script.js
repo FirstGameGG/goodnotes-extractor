@@ -387,7 +387,7 @@ async function downloadFile(fileId) {
     
     // Create meaningful filename
     const baseName = fileData.sourceFileName || 'file';
-    const cleanBaseName = baseName.replace(/[^a-z0-9_\-]/gi, '_'); // Remove invalid characters
+    const cleanBaseName = baseName.replace(/[\/\\:*?"<>|\x00-\x1F]/g, '_').trim(); // Remove invalid filename characters, preserve Unicode
     const filename = `${cleanBaseName}_${fileData.index + 1}.${fileData.extension}`;
     
     // Check if File System Access API is supported
