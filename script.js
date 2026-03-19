@@ -58,6 +58,116 @@ const DOM_IDS = {
 // UTILITY FUNCTIONS
 // ============================================
 
+/**
+ * Organizes, filters, sorts, and renames extracted files based on specific rules.
+ * @param {Array<Object>} attachments Array of JSZip entries and associated metadata.
+ * @returns {Promise<Array<Object>>} Processed and flattened array of files ready for UI rendering and download.
+ */
+async function organizeAndRenameFiles(attachments) {
+    const validFiles = [];
+
+    // 1. Initial Filtering & Processing
+    for (const item of attachments) {
+        try {
+            const { zipEntry, sourceFile, fileIndex } = item;
+            
+            // Filter out system files or tiny structural icons (under 10KB)
+            const uncompressedSize = zipEntry._data.uncompressedSize || 0;
+            if (uncompressedSize < 10240) {
+                continue; 
+            }
+
+            const blob = await zipEntry.async('blob');
+            let extension = await guessExtension(blob);
+            
+            // Normalize extensions based on existing constraints
+            if (extension === 'bin') {
+                extension = 'mp3';
+            }
+            if (['m4a', 'mp4'].includes(extension)) {
+                extension = 'mp3';
+            }
+
+            // Only allow designated extensions
+            if (!CONFIG.FILE_EXTENSIONS.ALLOWED.includes(extension)) {
+                continue;
+            }
+
+            // Categorize (Grouping Level 2)
+            let category = 'Unknown';
+            if (CONFIG.FILE_EXTENSIONS.AUDIO.includes(extension)) {
+                category = 'Audio';
+            } else if (CONFIG.FILE_EXTENSIONS.IMAGE.includes(extension)) {
+                category = 'Images';
+            } else if (CONFIG.FILE_EXTENSIONS.DOCUMENT.includes(extension)) {
+                category = 'PDFs';
+            }
+
+            // Parent directory (Grouping Level 1 - Based on Source File)
+            const parentDir = sourceFile.replace(/\.[^/.]+$/, ""); // Strip extension (e.g., .goodnotes)
+
+            // Include timestamp for chronological sorting
+            validFiles.push({
+                zipEntry,
+                blob,
+                extension,
+                category,
+                parentDir,
+                fileIndex,
+                sourceFile,
+                timestamp: zipEntry.date ? zipEntry.date.getTime() : Date.now()
+            });
+        } catch (error) {
+            console.warn(`Skipping corrupted or unreadable file in ${item.sourceFile}:`, error);
+        }
+    }
+
+    // 2. Group Valid Files
+    const groupedStructure = {};
+    for (const fileObj of validFiles) {
+        const { parentDir, category } = fileObj;
+        if (!groupedStructure[parentDir]) {
+            groupedStructure[parentDir] = { 'Audio': [], 'Images': [], 'PDFs': [] };
+        }
+        groupedStructure[parentDir][category].push(fileObj);
+    }
+
+    // 3. Sort chronologically and rename sequentially
+    const finalStructuredFiles = [];
+    let globalIndex = 0;
+
+    for (const parentDir in groupedStructure) {
+        for (const category in groupedStructure[parentDir]) {
+            const filesInCategory = groupedStructure[parentDir][category];
+            if (filesInCategory.length === 0) continue;
+
+            // Sort ascending: oldest -> newest
+            filesInCategory.sort((a, b) => a.timestamp - b.timestamp);
+
+            filesInCategory.forEach((fileObj, index) => {
+                // String padding constraint (e.g., Audio_01.mp3)
+                const seq = String(index + 1).padStart(2, '0');
+                
+                let prefix = 'File';
+                if (category === 'Audio') prefix = 'Audio';
+                else if (category === 'Images') prefix = 'Image';
+                else if (category === 'PDFs') prefix = 'Document';
+
+                // Combine for Group Level 2 specific renaming
+                const newFileName = `${prefix}_${seq}.${fileObj.extension}`;
+                
+                finalStructuredFiles.push({
+                    ...fileObj,
+                    newFileName,
+                    globalIndex: globalIndex++
+                });
+            });
+        }
+    }
+
+    return finalStructuredFiles;
+}
+
 function resetFileInput() {
     // Clean up blob URLs to prevent memory leaks
     if (window.fileData) {
@@ -110,50 +220,37 @@ document.getElementById(DOM_IDS.FILE_INPUT).addEventListener('change', async (e)
             return;
         }
 
-        // Sort by size
-        const sortedFiles = allAttachments.sort((a, b) =>
-            b.zipEntry._data.uncompressedSize - a.zipEntry._data.uncompressedSize
-        );
+        // Apply advanced filtering, sorting, and renaming logic
+        const organizedFiles = await organizeAndRenameFiles(allAttachments);
+
+        if (organizedFiles.length === 0) {
+            resultsDiv.innerHTML = createEmptyStateHTML(files.length);
+            return;
+        }
 
         const filesHTML = await Promise.all(
-            sortedFiles.map(async (item, index) => {
-                const { zipEntry, sourceFile } = item;
-                const blob = await zipEntry.async('blob');
-                let extension = await guessExtension(blob);
+            organizedFiles.map(async (item) => {
+                const { blob, extension, newFileName, parentDir, category, globalIndex, sourceFile } = item;
 
                 // Get MIME type for the extension
                 const mimeType = getMimeType(extension);
-                
-                // Convert unknown binary files to mp3 (assumed audio)
-                if (extension === 'bin') {
-                    extension = 'mp3';
-                }
-                
-                // For m4a/mp4 audio, keep extension as mp3 for download
-                if(['m4a', 'mp4'].includes(extension)) {
-                    extension = 'mp3';
-                }
-                
-                // Filter: Only process allowed file types (mp3, pdf, png)
-                if (!CONFIG.FILE_EXTENSIONS.ALLOWED.includes(extension)) {
-                    return null; // Skip this file
-                }
-                
                 const typedBlob = new Blob([blob], { type: mimeType });
                 const fileUrl = URL.createObjectURL(typedBlob);
                 const fileSizeMB = (blob.size / CONFIG.UNITS.BYTES_TO_MB).toFixed(CONFIG.UNITS.DECIMAL_PLACES);
-                const isAudio = CONFIG.FILE_EXTENSIONS.AUDIO.includes(extension) || mimeType.startsWith('audio/');
-                const isPDF = extension === 'pdf';
-                const isImage = CONFIG.FILE_EXTENSIONS.IMAGE.includes(extension) || mimeType.startsWith('image/');
+                
+                const isAudio = category === 'Audio';
+                const isPDF = category === 'PDFs';
+                const isImage = category === 'Images';
 
-                // Store file data for later use
+                // Store file data for later use matching the new structure
                 window.fileData = window.fileData || {};
-                window.fileData[`file_${index}`] = {
+                window.fileData[`file_${globalIndex}`] = {
                     url: fileUrl,
                     extension: extension,
                     blob: typedBlob,
-                    sourceFileName: sourceFile.replace('.goodnotes', ''),
-                    index: index
+                    sourceFileName: parentDir,
+                    newFileName: newFileName,
+                    index: globalIndex
                 };
 
                 let previewHTML = '';
@@ -163,16 +260,16 @@ document.getElementById(DOM_IDS.FILE_INPUT).addEventListener('change', async (e)
                 } else if (isPDF) {
                     previewHTML = createPDFPreviewHTML(fileUrl);
                 } else if (isImage) {
-                    previewHTML = createImagePreviewHTML(fileUrl, index);
+                    previewHTML = createImagePreviewHTML(fileUrl, globalIndex);
                 } else {
                     previewHTML = createDefaultPreviewHTML();
                 }
 
-                return createFileCardHTML(previewHTML, index, extension, isAudio, isPDF, isImage, fileSizeMB, sourceFile, files.length);
+                return createFileCardHTML(previewHTML, globalIndex, extension, isAudio, isPDF, isImage, fileSizeMB, newFileName, files.length);
             })
         );
 
-        // Filter out null values (unsupported file types)
+        // Filter out any potential nulls
         const filteredFilesHTML = filesHTML.filter(html => html !== null);
         
         if (filteredFilesHTML.length === 0) {
